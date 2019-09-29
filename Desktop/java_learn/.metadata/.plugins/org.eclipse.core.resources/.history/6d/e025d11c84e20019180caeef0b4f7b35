@@ -1,0 +1,91 @@
+package Cal;
+
+import java.util.regex.*;
+import java.util.*;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Calculator{
+	    /**
+	     *设置运算符的优先级：
+	     *	根据题目要求 + - * / 优先级相同
+	     */
+	    private static final Map<Character, Integer> basic = new HashMap<Character, Integer>();
+	    static {
+	        basic.put('-', 1);
+	        basic.put('+', 1);
+	        basic.put('*', 1);
+	        basic.put('/', 1);
+	        basic.put('(', 0);
+	    }
+	    
+    Calculator(){
+
+    }
+
+    /*
+    *   判断表达是是否合法
+    */
+    public static boolean isLegal(String expression){
+        //表达式的正确模式
+        String pattern = "((\\(-?\\d+\\))|-?(\\d+))([+\\-*\\/]((\\(\\-\\d+\\))|(\\d+)))+";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(expression);
+        if(m.matches()) {
+            return true;
+        }
+        
+        return false;
+    }
+    //获取用户输入的表达式
+    public String getExpression() {
+        Scanner input = new Scanner(System.in);
+        String expression = input.nextLine();
+        expression = expression.replace(" ",""); //除去多余空格
+        return expression;
+    }
+    //重整合表达式
+    public String resetExpression(String rawExpression) {
+        String pattern = "\\([\\-\\+]\\d+\\)";          //匹配带括号的项
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(rawExpression);
+        String [] itemArray = rawExpression.split(pattern);
+        
+        String newExpression = "";
+        String newItem = "";
+        int i = 0;
+        //在前面加 0，重新整合如 （+1）--->（0 + 1）
+        while(m.find() && i <itemArray.length)
+        {
+            newItem = "(0" + rawExpression.substring(m.start()+1,m.end());
+            newExpression += (itemArray[i] + newItem);
+            i++;
+        }
+        while(i < itemArray.length) {
+            newExpression += itemArray[i];
+            i++;
+        }
+        //诺以带符号的数字开头，则加 0
+        Pattern p2 = Pattern.compile("^([+\\-]\\d+)");
+        Matcher m2 = p2.matcher(newExpression);
+        if(m2.find()) {
+            newExpression = "(0" + m2.group()+")"+newExpression.substring(m2.end());
+        }
+        return newExpression;
+    }
+
+    
+    
+    
+    // 测试
+    public static void main(String [] args){
+        Calculator r = new Calculator();
+        String expression = r.getExpression();
+        System.out.println(r.calculate(expression));
+    }
+}

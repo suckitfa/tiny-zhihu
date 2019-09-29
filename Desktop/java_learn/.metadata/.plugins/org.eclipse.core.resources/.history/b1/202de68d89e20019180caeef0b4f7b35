@@ -1,0 +1,12 @@
+package Cal;
+public class CalTest{
+	
+	
+	public static void main(String [] args) {
+		double a = -5;
+		double b = 3;
+		double c = a/b;
+		String m = "-2+3*(-5)/3-2*9";
+		System.out.println(a+"/"+b+"="+c);
+	}
+}

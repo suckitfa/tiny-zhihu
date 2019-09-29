@@ -1,0 +1,25 @@
+package experiment_1;
+
+import java.util.Scanner;
+
+
+
+public class GCD{
+
+	public int gcd(int a,int b){
+	  	 return (a==0?b:gcd(b%a,a));
+   	}
+
+   	public static void main(String [] args){
+   		GCD g = new GCD();
+   		Scanner input = new Scanner(System.in);
+   		System.out.print("输入 a b :");
+   		int a = input.nextInt();
+   		int b = input.nextInt();
+
+
+   		System.out.printf("GCD(%d,%d): %d",a,b,g.gcd(a,b));
+   	}
+
+
+}

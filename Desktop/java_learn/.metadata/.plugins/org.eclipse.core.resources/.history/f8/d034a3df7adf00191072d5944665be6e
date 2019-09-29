@@ -1,0 +1,25 @@
+package experiment_1;
+
+import java.util.Scanner;
+
+
+
+public class GCD{
+
+	public long gcd2(long a,long b){
+	  	 return (a==0?b:gcd2(b%a,a));
+   	}
+
+   	public static void main(String [] args){
+   		GCD g = new GCD();
+   		Scanner input = new Scanner(System.in);
+   		System.out.print("输入 a b :");
+   		long a = input.nextLong();
+   		long b = input.nextLong();
+
+
+   		System.out.printf("GCD(%ld,%ld): %ld",a,b,g.GCD(a,b));
+   	}
+
+
+}

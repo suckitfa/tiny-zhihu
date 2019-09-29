@@ -1,0 +1,11 @@
+package experiment_1;
+
+public class Test {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String res = String.format("%.0f",5.00);
+		System.out.println(res);
+	}
+
+}

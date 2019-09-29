@@ -1,0 +1,142 @@
+package experiment_1;
+import java.util.regex.*;
+import java.util.*;
+import java.util.Scanner;
+public class CalculatorTest{
+	int result;
+	int flag = 0;
+	CalculatorTest(){
+
+	}
+
+	/*
+	*	判断表达是是否合法
+	*/
+	public static boolean isLegal(String expression){
+	
+		String pattern = "((\\(-?\\d+\\))|-?(\\d+))([+\\-*\\/]((\\(\\-\\d+\\))|(\\d+)))+";
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(expression);
+		if(m.matches()) {
+			return true;
+		}
+		
+		return false;
+		
+//		//空字符		
+//		if("".equals(expression)){
+//			return false;
+//		}
+//
+//		//不合法表达式-----正则模式
+//		String [] patternStr = {
+//			"[+-/\\*]{2,}",									//连续运算符
+//			"\\(\\)",										//空括号
+//			"[+-/\\*]\\)",									// )前面为运算符
+//			"[+-/\\*]$|\\($",								// 以运算符结尾 或 （ 结尾
+//			"=|!|@|#|\\$|%|:|;|<|>|\\^|`|~|\\?|[a-z]|[A-Z]|&",	//非法字符
+//			"\\(\\d+|[+-/\\*]\\d+\\)\\(\\\\d+|[+-/\\\\*]\\\\d+\\\\\\)",//连续括号
+//			"\\d+\\(\\d+|[+-/\\*]\\d+\\)",						//数字与括号连续
+//			"\\([/\\*]\\d+\\)",									//* / 与数字在括号中
+//			
+//		};
+//		for(int i = 0; i < patternStr.length;i++){
+//			Pattern p = Pattern.compile(patternStr[i]);
+//			Matcher m = p.matcher(expression);
+//			if(m.find()){								//匹配表达式的字串
+//				return false;
+//			}
+//		}
+//		
+//		
+//		
+//		return true;
+	}
+	
+	public double computeTwo(double data_1, double data_2, char op) {
+		double res =0 ;
+		if(op == '+') {
+			res = data_1 + data_2;
+		}else if(op == '-') {
+			res = data_1 - data_2;
+		}else if(op == '*') {
+			res = data_1*data_2;
+		}else if(op == '/') {
+			res = data_1 / data_2;
+		}
+		
+		return res;
+	}
+	/*
+	 * 计算合法的表达式
+	 * */
+	public String calculate(String expression) {
+			/* 操作数数组 */
+	        List<Double> number = new ArrayList<Double>();
+	        /* 运算符数组 */
+	        List<Character> operator = new ArrayList<Character>();
+	
+	        /* 将legalExp中的操作数和操作符
+	         * 分散到运算数和运算符数组 
+	         * */
+	        //这个正则为匹配表达式中的数字
+	        Pattern p = Pattern.compile("(?<!\\d)-?\\d+(\\.\\d+)?");
+	        Matcher m = p.matcher(expression);
+	        while (m.find()) {
+	            number.add( Double.valueOf(m.group()) );//将该数字放进数字的数组
+	            if (m.end() < expression.length()) {
+	            	char op;
+	            	op = expression.charAt(m.end());
+	            	if(op == ')') {
+	            		op = expression.charAt(m.end()+1);		//数字在括号里面
+	            		operator.add(op);
+	            	}else {
+	            		operator.add(expression.charAt(m.end())); //与该数字相邻的运算符放入运算符的数组
+	            	}
+	            }
+	        }
+	   
+	        
+	        //使用栈来存储结果
+	       Stack<Double> numberStack = new Stack<Double>();
+	          for(int i = number.size()-1;i >= 0; i--) {
+	        	  numberStack.push(number.get(i));
+	          }
+	          for(int i =0; i < operator.size();i++) {
+	        	  numberStack.push(computeTwo(numberStack.pop(),numberStack.pop(),operator.get(i)));
+	          }
+	          
+	     
+	          return numberStack.pop() + "";     
+	          
+	          
+	}
+	//获取用户输入的表达式
+	public String getExpression() {
+		Scanner input = new Scanner(System.in);
+		String expression = input.nextLine();
+		expression = expression.replace(" ",""); //除去多余空格
+		return expression;
+	}
+
+	// 测试
+	public static void main(String [] args){
+		CalculatorTest r = new CalculatorTest();
+		String expression = r.getExpression();
+		
+		
+		if(r.isLegal(expression)) {
+			String result = r.calculate(expression);
+			if("Infinity".equals(result)) {//借助Java中 Infinity
+				System.out.print("Error:Divided by zero!");
+			}else {
+				String newResult = String.format("%.0f",Double.parseDouble(result));
+				System.out.print(expression + "=" + newResult);
+			}
+		}else {
+			System.out.print("FORMAT ERROR!");
+		}
+		
+
+	}
+}

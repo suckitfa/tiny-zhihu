@@ -1,0 +1,52 @@
+package experiment_1;
+import java.util.*;
+import java.util.regex.*;
+
+public class RegexTest {
+
+	public static void main(String[] args) {
+//		// TODO Auto-generated method stub
+		String rawExpression = "1+(-3)+1+(-1)*(+1)";
+		String pattern = "\\([\\-\\+]\\d+\\)";
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(rawExpression);
+		String [] itemArray = rawExpression.split(pattern);
+		
+//		for(int i = 0; i < itemArray.length; i++) {
+//			System.out.println(itemArray[i]);
+//		}
+		String newExpression = "";
+		String newItem = "";
+		int i = 0;
+		m.find();
+		System.out.println(m.group());
+		newItem = "(0" + rawExpression.substring(m.start()+1,m.end());
+		System.out.println(newItem);
+//		while(m.find() && i < itemArray.length) {
+//			newItem = "(0"+ m.group().substring();
+//			newExpression += (itemArray[i] + newItem);
+//			i++;
+//		}
+//		System.out.println(newExpression);
+	}
+
+}
+//
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
+// 
+//public class RegexTest
+//{
+//    private static String REGEX = "dog";
+//    private static String INPUT = "The dog says meow. " +
+//                                    "All dogs say meow.";
+//    private static String REPLACE = "cat";
+// 
+//    public static void main(String[] args) {
+//       Pattern p = Pattern.compile(REGEX);
+//       // get a matcher object
+//       Matcher m = p.matcher(INPUT); 
+//       INPUT = m.replaceAll(REPLACE);
+//       System.out.println(INPUT);
+//   }
+//}
