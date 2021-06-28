@@ -3,7 +3,9 @@ const {
     getDetail,
     newArticle,
     updateArticle,
-    deleteArticle
+    deleteArticle,
+    addArticleCountOnce,
+    publishArticle
 } = require('../controller/article');
 const { login } = require('../controller/user');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
@@ -14,7 +16,7 @@ const loginCheck = (req) => {
     }
 }
 
-const handleBlogRouter = (req, res) => {
+const handleArticleRouter = (req, res) => {
     const { method, path } = req;
 
     // 获取博客的id
@@ -42,6 +44,7 @@ const handleBlogRouter = (req, res) => {
     // 新建一篇博客 
     if (method === 'POST' && path === '/api/article/new') {
         const postData = req.body;
+        console.log('article = ', postData);
         const result = newArticle(req.body);
         return result.then(data => {
             return new SuccessModel(data);
@@ -51,7 +54,7 @@ const handleBlogRouter = (req, res) => {
 
     // 更新一篇博客
     if (method === 'POST' && path === '/api/article/update') {
-        const result = updateArticle(articleid, req.body);
+        const result = updateArticle(req.body);
         return result.then(val => {
             if (val) {
                 return new SuccessModel();
@@ -63,6 +66,7 @@ const handleBlogRouter = (req, res) => {
 
     // 删除一篇博客
     if (method === "POST" && path === '/api/article/delete') {
+        const { articleid } = req.body;
         const result = deleteArticle(articleid);
         return result.then(val => {
             if (val) {
@@ -72,6 +76,30 @@ const handleBlogRouter = (req, res) => {
             }
         });
     }
+
+    // 增加一篇文章的阅读量一次
+    if (method === "POST" && path === '/api/article/addonecount') {
+        const { articleid } = req.body;
+        const result = addArticleCountOnce(articleid);
+        return result.then(val => {
+            if (val) {
+                return new SuccessModel();
+            } else {
+                return new ErrorModel("增加阅读量失败!");
+            }
+        });
+    }
+
+    if (method === "POST" && path === '/api/article/publish') {
+        const { articleid } = req.body;
+        const result = publishArticle(articleid);
+        return result.then(data => {
+            if (data) {
+                return new SuccessModel("发布成功!");
+            }
+            return new ErrorModel('发布失败!');
+        });
+    }
 }
 
-module.exports = handleBlogRouter;
+module.exports = handleArticleRouter;

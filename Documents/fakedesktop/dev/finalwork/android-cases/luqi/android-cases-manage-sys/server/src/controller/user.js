@@ -1,7 +1,11 @@
 const { exec } = require("../db/mysql");
 
-const login = (username, password) => {
-    const sql = `select username,realname from users where password='${password}' and username='${username}';`
+const login = (studentid, password) => {
+    const sql = `select userid,username,studentid,isadmin
+     from users where 
+    1=1 
+    and password=md5('${password}')
+    and studentid='${studentid}';`
     return exec(sql).then(rows => {
         return rows[0] || {};
     });
@@ -36,8 +40,8 @@ const newUser = (userData) => {
     });
 }
 
-const updateUser = (userid, userData) => {
-    const { username, studentid, password, isadmin = 0, status = 1 } = userData;
+const updateUser = (userData) => {
+    const { userid, username, studentid, password, isadmin = 0, status = 1 } = userData;
     const sql = `update users set 
     username='${username}',
     password=md5('${password}'),

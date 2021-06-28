@@ -1,11 +1,14 @@
 const querystring = require('querystring');
 const { access } = require('./src/utils/log');
-const handleBlogRouter = require('./src/router/article');
+const handleArticleRouter = require('./src/router/article');
 const handleUserRouter = require('./src/router/user');
-const handleInfoRouter = require('./src/router/info');
-// session数据
-const SESSION_DATA = {}
-    // 获取cookie的过期事件
+const handleReadLogRouter = require('./src/router/readlog');
+const handleKeyPointRouter = require('./src/router/keypoint');
+const handleScoreRouter = require('./src/router/scores');
+const { get } = require('./src/db/redis');
+// SESSION
+const SESSION_DATA = {};
+// 获取cookie的过期事件
 const getCookieExpires = () => {
     const d = new Date();
     d.setTime(d.getTime() + (24 * 60 * 60 * 1000));
@@ -16,15 +19,18 @@ const getCookieExpires = () => {
 // 用于处理post data
 const getPostData = (req) => {
     const promise = new Promise((resolve, reject) => {
+        const dataType = req.headers['content-type'];
+
         if (req.method !== 'POST') {
             resolve({});
             return;
         }
-        // 保证传入的数据格式为json
-        if (req.headers['content-type'] !== 'application/json') {
+        // 传入数据格式不是json
+        if (dataType && dataType.indexOf('application/json') === -1) {
             resolve({});
             return;
         }
+
         let postData = "";
         req.on('data', chunk => {
             postData += chunk.toString();
@@ -45,9 +51,14 @@ const serverHandle = (req, res) => {
     // 记录access log
     access(`${req.method} -- ${req.url} -- ${req.headers['user-agent']} -- ${Date.now()}`);
     // 保证返回的数据为JSON
-    res.setHeader('content-type', 'application/json');
-
+    res.setHeader('Content-Type', 'application/json');
+    // 暂时允许跨域
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     // 获取url,path
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     const url = req.url;
     req.path = url.split('?')[0];
 
@@ -78,18 +89,21 @@ const serverHandle = (req, res) => {
         SESSION_DATA[userId] = {};
     }
     req.session = SESSION_DATA[userId];
+
+
     // 处理postData之后，在then中处理对应的路由
     getPostData(req).then(postData => {
         req.body = postData;
+
         // 处理blog路由,并返回对应数据
-        const blogResult = handleBlogRouter(req, res);
-        if (blogResult) {
-            blogResult.then(blogData => {
-                if (blogData) {
+        const articleResult = handleArticleRouter(req, res);
+        if (articleResult) {
+            articleResult.then(articleData => {
+                if (articleData) {
                     if (needSetCookie) {
                         res.setHeader('Set-Cookie', `userid=${userId};path=/; httpOnly; expires=${getCookieExpires()}`);
                     }
-                    res.end(JSON.stringify(blogData));
+                    res.end(JSON.stringify(articleData));
                 }
             });
             return;
@@ -111,22 +125,43 @@ const serverHandle = (req, res) => {
             });
             return;
         }
-        const infoResult = handleInfoRouter(req, res);
-        if (infoResult) {
-            infoResult.then(infoData => {
-                if (infoData) {
+        // 阅读记录
+        const logResult = handleReadLogRouter(req, res);
+        if (logResult) {
+            logResult.then(logData => {
+                if (logData) {
                     if (needSetCookie) {
                         res.setHeader('Set-Cookie', `userid=${userId};path=/; httpOnly; expires=${getCookieExpires()}`);
                     }
                     res.end(
-                        JSON.stringify(infoData)
+                        JSON.stringify(logData)
                     );
                 }
             });
             return;
         }
 
+        // 知识点管理
+        const keyPointResult = handleKeyPointRouter(req, res);
+        if (keyPointResult) {
+            keyPointResult.then(keyPointData => {
+                if (keyPointData) {
+                    res.end(JSON.stringify(keyPointData));
+                }
+            });
+            return;
+        }
 
+        const scoreResult = handleScoreRouter(req, res);
+        if (scoreResult) {
+            scoreResult.then(scoreData => {
+                if (scoreData) {
+                    console.log('res = ', scoreData);
+                    res.end(JSON.stringify(scoreData));
+                }
+            });
+            return;
+        }
         // 未命中路由返回404
         res.writeHead(404, {
             "content-type": "text/plain"
