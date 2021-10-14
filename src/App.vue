@@ -1,34 +1,18 @@
 <template>
   <div class="container">
-    <!-- 引入boostrap的类 -->
   <GlobalHeader :user="currentUser" />
-    <validateForm @form-submit="onFormSubmit">
-      <div class="mb-3">
-        <label for="validateInput">电子邮箱</label>
-        <validateInput
-          placeholder="请输入邮箱地址"
-          id="validateInput"
-          :rules="emailRules"
-          type="text"
-          ref="inputRef"
-          v-model="emailVal"
-        />
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">密码</label>
-        <validateInput
-          type="password"
-          class="form-control"
-          id="exampleInputPassword1"
-          placeholder="请输入密码"
-          :rules="passwordRules"
-          v-model="passwordVal"
-        />
-      </div>
-      <template #submit>
-        <button class="btn btn-primary">登入</button>
-      </template>
-    </validateForm>
+  <router-view></router-view>
+  <footer class="text-center py-4 text-secondary bg-light mt-6">
+      <small>
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item">© 2020 者也专栏</li>
+          <li class="list-inline-item">课程</li>
+          <li class="list-inline-item">文档</li>
+          <li class="list-inline-item">联系</li>
+          <li class="list-inline-item">更多</li>
+        </ul>
+      </small>
+    </footer>
   </div>
 </template>
 
@@ -94,9 +78,7 @@ const currentUser: UserProps = {
 export default defineComponent({
   name: 'App',
   components: {
-    GlobalHeader,
-    validateInput,
-    validateForm
+    GlobalHeader
   },
   setup () {
     const emailRef = reactive({

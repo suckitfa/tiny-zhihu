@@ -12,10 +12,10 @@
 import { defineComponent, onUnmounted } from 'vue'
 import mitt, { Emitter } from 'mitt'
 
-// 定义验证函数
+// 定义验证函数的类型
 type ValidateFunc = ()=>boolean
 
-// 定义mitt的事件类型
+// key:value => 事件：返回值
 type Events = {
   'form-item-created':ValidateFunc;
 }
