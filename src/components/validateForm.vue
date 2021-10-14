@@ -10,22 +10,40 @@
 </template>
 <script lang="ts">
 import { defineComponent, onUnmounted } from 'vue'
-import mitt from 'mitt'
-export const emitter = mitt()
+import mitt, { Emitter } from 'mitt'
+
+// 定义验证函数
+type ValidateFunc = ()=>boolean
+
+// 定义mitt的事件类型
+type Events = {
+  'form-item-created':ValidateFunc;
+}
+export const emitter = mitt<Events>()
+
 export default defineComponent({
   name: 'valideFrom',
   // 自定义事件
   emits: ['form-submit'],
   setup (props, context) {
+    const funcArr:ValidateFunc[] = []
+
+    // 循环调用传入的验证函数
     const submitForm = () => {
-      context.emit('form-submit', true)
+      const result = funcArr.map(func => func()).every(res => res)
+      context.emit('form-submit', result)
     }
-    const callback = (test:string) => {
-      console.log(test)
+
+    const callback = (func:ValidateFunc) => {
+      funcArr.push(func)
     }
+
+    // 设置监听事件
     emitter.on('form-item-created', callback)
     onUnmounted(() => {
       emitter.off('form-item-created', callback)
+      // 清空验证函数数组
+      funcArr.length = 0
     })
     return {
       submitForm

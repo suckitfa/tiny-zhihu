@@ -13,10 +13,11 @@
 </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, PropType } from 'vue'
+import { defineComponent, reactive, PropType, onMounted } from 'vue'
+import { emitter } from './validateForm.vue'
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
-  type: 'required' | 'email';
+  type: 'required' | 'email' | 'password';
   message: string;
 }
 export type RulesProp = RuleProp[];
@@ -32,6 +33,7 @@ export default defineComponent({
       error: false,
       message: ''
     })
+    // 这里支持v-model
     const updateValue = (e:KeyboardEvent) => {
       const targetValue = (e.target as HTMLInputElement).value
       inputRef.val = targetValue
@@ -49,6 +51,9 @@ export default defineComponent({
             case 'required':
               passed = emailReg.test(inputRef.val)
               break
+            case 'password':
+              passed = (inputRef.val.trim() !== '')
+              break
             default:
               break
           }
@@ -59,6 +64,10 @@ export default defineComponent({
       }
       return true
     }
+
+    onMounted(() => {
+      emitter.emit('form-item-created', validateInput)
+    })
     return {
       inputRef,
       validateInput,

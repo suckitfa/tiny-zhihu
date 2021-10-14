@@ -11,6 +11,7 @@
           :rules="emailRules"
           type="text"
           ref="inputRef"
+          v-model="emailVal"
         />
       </div>
       <div class="mb-3">
@@ -21,6 +22,7 @@
           id="exampleInputPassword1"
           placeholder="请输入密码"
           :rules="passwordRules"
+          v-model="passwordVal"
         />
       </div>
       <template #submit>
@@ -31,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, onMounted, reactive, ref } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import ColumnList, { ColumnProps } from './components/ColumnList.vue'
 import GlobalHeader, { UserProps } from './components/GlobalHeader.vue'
@@ -97,12 +99,13 @@ export default defineComponent({
     validateForm
   },
   setup () {
-    const emailVal = ref('shit')
     const emailRef = reactive({
       val: '',
       error: false,
       message: ''
     })
+
+    const emailVal = ref('')
     const validateEmail = () => {
       if (emailRef.val.trim() === '') {
         emailRef.error = true
@@ -117,8 +120,9 @@ export default defineComponent({
       { type: 'required', message: '电子邮箱地址不能为空' },
       { type: 'email', message: '请输入正确的邮箱格式' }
     ]
+    const passwordVal = ref('')
     const passwordRules:RulesProp = [
-      { type: 'required', message: '密码不能为空' }
+      { type: 'password', message: '密码不能为空' }
     ]
     const inputRef = ref<any>()
     const onFormSubmit = (test:boolean) => {
@@ -133,7 +137,8 @@ export default defineComponent({
       passwordRules,
       emailVal,
       onFormSubmit,
-      inputRef
+      inputRef,
+      passwordVal
     }
   }
 })
