@@ -30,7 +30,7 @@ export default defineComponent({
 
     // 循环调用传入的验证函数
     const submitForm = () => {
-      const result = funcArr.map(func => func()).every(res => res)
+      const result:boolean = funcArr.map(func => func()).every(res => res)
       context.emit('form-submit', result)
     }
 
