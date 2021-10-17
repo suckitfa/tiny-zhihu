@@ -1,15 +1,24 @@
 import { createStore } from 'vuex'
-import { testData, testPosts, PostProps } from './testData'
+import { testData, testPosts } from './testData'
 export interface UserPorps {
     isLogin:boolean;
     name?:string;
     id?:number;
+    columnId?:number;
 }
 export interface ColumnProps {
   id: number;
   title: string;
   avatar?: string;
   description: string;
+}
+export interface PostProps {
+  id: number;
+  title: string;
+  content: string;
+  image?: string;
+  createdAt: string;
+  columnId: number;
 }
 // 全局数据类型
 export interface GlobalDataProps {
@@ -23,13 +32,18 @@ const store = createStore<GlobalDataProps>({
     columns: testData,
     posts: testPosts,
     user: {
-      isLogin: false
+      isLogin: false,
+      name: 'bob',
+      columnId: 1
     }
   },
   mutations: {
     login (state) {
     // 更新登入状态信息
       state.user = { ...state.user, isLogin: true, name: 'bob' }
+    },
+    createPost (state, newPost) {
+      state.posts.push(newPost)
     },
     logout (state) {
       state.user = { ...state.user, isLogin: false }
