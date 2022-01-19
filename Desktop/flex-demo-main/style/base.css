@@ -1,0 +1,8 @@
+.item {
+    box-sizing: border-box;
+    background:pink;
+    width: 80px;
+    height: 80px;
+    text-align:center;
+    line-height:80px;
+}
